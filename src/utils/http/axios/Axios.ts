@@ -13,6 +13,7 @@ import { AxiosCanceler } from './axiosCancel';
 import { isFunction } from '@/utils/is';
 import { cloneDeep } from 'lodash-es';
 import { ContentTypeEnum, RequestEnum } from '@/enums/httpEnum';
+import { checkStatusErrorMessage } from './checkStatus';
 
 export * from './axiosTransform';
 
@@ -238,12 +239,19 @@ export class VAxios {
           resolve(res as unknown as Promise<T>);
         })
         .catch((e: Error | AxiosError) => {
+          // ===== 在执行如下代码之前，会先执行 responseInterceptorsCatch 拦截器 =====
+
+          // 如果存在 请求失败hook，那么走 请求失败hook
           if (requestCatchHook && isFunction(requestCatchHook)) {
             reject(requestCatchHook(e, opt));
             return;
           }
           if (axios.isAxiosError(e)) {
             // rewrite error message from axios in here
+            // 覆盖 axios 默认的错误信息
+            if (e.response) {
+              e.message = checkStatusErrorMessage(e.response.status);
+            }
           }
           reject(e);
         });

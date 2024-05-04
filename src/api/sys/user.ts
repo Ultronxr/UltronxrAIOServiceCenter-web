@@ -6,13 +6,13 @@ import { ErrorMessageMode } from '#/axios';
 enum Api {
   Login = '/login',
   Logout = '/logout',
-  GetUserInfo = '/getUserInfo',
-  GetPermCode = '/getPermCode',
+  GetUserInfo = '/system/user/getUserInfo',
+  GetPermCode = '/system/permission/getPermissionCodeList',
   TestRetry = '/testRetry',
 }
 
 /**
- * @description: user login api
+ * @description: 用户登录 API
  */
 export function loginApi(params: LoginParams, mode: ErrorMessageMode = 'modal') {
   return defHttp.post<LoginResultModel>(
@@ -27,10 +27,10 @@ export function loginApi(params: LoginParams, mode: ErrorMessageMode = 'modal') 
 }
 
 /**
- * @description: getUserInfo
+ * @description: 获取用户信息
  */
 export function getUserInfo() {
-  return defHttp.get<GetUserInfoModel>({ url: Api.GetUserInfo }, { errorMessageMode: 'none' });
+  return defHttp.get<GetUserInfoModel>({ url: Api.GetUserInfo }, { errorMessageMode: 'message' });
 }
 
 export function getPermCode() {

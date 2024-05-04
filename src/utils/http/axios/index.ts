@@ -17,7 +17,7 @@ import { useErrorLogStoreWithOut } from '@/store/modules/errorLog';
 import { useI18n } from '@/hooks/web/useI18n';
 import { joinTimestamp, formatRequestDate } from './helper';
 import { useUserStoreWithOut } from '@/store/modules/user';
-import { AxiosRetry } from '@/utils/http/axios/axiosRetry';
+// import { AxiosRetry } from '@/utils/http/axios/axiosRetry';
 import axios from 'axios';
 
 const globSetting = useGlobSetting();
@@ -72,29 +72,29 @@ const transform: AxiosTransform = {
 
     // 在此处根据自己项目的实际情况对不同的code执行不同的操作
     // 如果不希望中断当前请求，请return数据，否则直接抛出异常即可
-    let timeoutMsg = '';
+    let alertMsg = '';
     switch (code) {
       case ResultEnum.TIMEOUT:
-        timeoutMsg = t('sys.api.timeoutMessage');
+        alertMsg = t('sys.api.timeoutMessage');
         const userStore = useUserStoreWithOut();
         // 被动登出，带redirect地址
         userStore.logout(false);
         break;
       default:
         if (message) {
-          timeoutMsg = message;
+          alertMsg = message;
         }
     }
 
     // errorMessageMode='modal'的时候会显示modal错误弹窗，而不是消息提示，用于一些比较重要的错误
     // errorMessageMode='none' 一般是调用时明确表示不希望自动弹出错误提示
     if (options.errorMessageMode === 'modal') {
-      createErrorModal({ title: t('sys.api.errorTip'), content: timeoutMsg });
+      createErrorModal({ title: t('sys.api.errorTip'), content: alertMsg });
     } else if (options.errorMessageMode === 'message') {
-      createMessage.error(timeoutMsg);
+      createMessage.error(alertMsg);
     }
 
-    throw new Error(timeoutMsg || t('sys.api.apiRequestFailed'));
+    throw new Error(alertMsg || t('sys.api.apiRequestFailed'));
   },
 
   // 请求之前处理config
@@ -151,7 +151,15 @@ const transform: AxiosTransform = {
   },
 
   /**
-   * @description: 请求拦截器处理
+   * @description: 请求失败的 hook （在请求失败拦截器 responseInterceptorsCatch 之后运行）
+   */
+  // requestCatchHook: (e: Error, options: RequestOptions) => {
+  //   console.debug('requestCatchHook invoke.');
+  //   return;
+  // },
+
+  /**
+   * @description: 请求拦截器
    */
   requestInterceptors: (config, options) => {
     // 请求之前处理config
@@ -166,14 +174,14 @@ const transform: AxiosTransform = {
   },
 
   /**
-   * @description: 响应拦截器处理
+   * @description: 响应拦截器
    */
   responseInterceptors: (res: AxiosResponse<any>) => {
     return res;
   },
 
   /**
-   * @description: 响应错误处理
+   * @description: 响应错误拦截器
    */
   responseInterceptorsCatch: (axiosInstance: AxiosInstance, error: any) => {
     const { t } = useI18n();
@@ -212,13 +220,14 @@ const transform: AxiosTransform = {
     checkStatus(error?.response?.status, msg, errorMessageMode);
 
     // 添加自动重试机制 保险起见 只针对GET请求
-    const retryRequest = new AxiosRetry();
-    const { isOpenRetry } = config.requestOptions.retryRequest;
-    config.method?.toUpperCase() === RequestEnum.GET &&
-      isOpenRetry &&
-      error?.response?.status !== 401 &&
-      // @ts-ignore
-      retryRequest.retry(axiosInstance, error);
+    // const retryRequest = new AxiosRetry();
+    // const { isOpenRetry } = config.requestOptions.retryRequest;
+    // config.method?.toUpperCase() === RequestEnum.GET &&
+    //   isOpenRetry &&
+    //   error?.response?.status !== 401 &&
+    //   // @ts-ignore
+    //   retryRequest.retry(axiosInstance, error);
+
     return Promise.reject(error);
   },
 };

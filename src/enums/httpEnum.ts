@@ -1,10 +1,11 @@
 /**
  * @description: Request result set
+ * @description: 自定义请求结果状态码（AjaxResponse 的 code）
  */
 export enum ResultEnum {
   SUCCESS = 0,
   ERROR = -1,
-  TIMEOUT = 401,
+  TIMEOUT = 999,
   TYPE = 'success',
 }
 
