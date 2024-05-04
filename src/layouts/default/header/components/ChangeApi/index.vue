@@ -34,7 +34,8 @@
   });
   // perf 能读取所有.env.xxx文件最好, 另外key与--mode XXX最好相同
   const addresses = ref({
-    development: 'http://www.a.com',
+    development: 'http://localhost:9500',
+    mock: 'http://localhost:3000',
     test: 'http://www.b.com',
     prod: 'http://www.c.com',
   });
