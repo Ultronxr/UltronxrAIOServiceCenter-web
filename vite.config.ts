@@ -16,6 +16,10 @@ export default defineApplicationConfig({
       ],
     },
     server: {
+      // 项目启动端口
+      port: 5174,
+      // 项目启动后，自动打开浏览器
+      open: false,
       proxy: {
         '/basic-api': {
           target: 'http://localhost:3000',
@@ -32,14 +36,13 @@ export default defineApplicationConfig({
           rewrite: (path) => path.replace(new RegExp(`^/upload`), ''),
         },
       },
-      open: true, // 项目启动后，自动打开
       warmup: {
         clientFiles: ['./index.html', './src/{views,components}/*'],
       },
     },
     plugins: [
       Inspector({
-        openInEditorHost: 'http://localhost:5173',
+        openInEditorHost: 'http://localhost:5174',
       }),
     ],
   },
